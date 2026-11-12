@@ -1,10 +1,5 @@
-
 pipeline {
     agent any
-
-    tools {
-        maven 'Maven'
-    }
 
     stages {
         stage('Checkout') {
@@ -16,6 +11,12 @@ pipeline {
         stage('Build Maven Project') {
             steps {
                 bat 'mvn clean package'
+            }
+        }
+
+        stage('Check Ansible') {
+            steps {
+                bat 'wsl.exe -d Ubuntu -- ansible-playbook --version'
             }
         }
 
