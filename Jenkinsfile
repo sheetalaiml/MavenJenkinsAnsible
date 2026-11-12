@@ -14,16 +14,25 @@ pipeline {
             }
         }
 
-        stage('Check Ansible') {
-            steps {
-                bat 'wsl.exe -d Ubuntu -- ansible-playbook --version'
-            }
-        }
-
         stage('Archive Artifact') {
             steps {
                 archiveArtifacts artifacts: 'target/*.jar',
                                  fingerprint: true
+            }
+        }
+
+        stage('Copy Artifact for Deployment') {
+            steps {
+                bat '''
+                    if not exist "C:/DeployedArtifacts/staging" mkdir "C:/DeployedArtifacts/staging"
+                    copy /Y "target/student-app-1.0.jar" "C:/DeployedArtifacts/staging/student-app-1.0.jar"
+                '''
+            }
+        }
+
+        stage('Deploy using Ansible') {
+            steps {
+                bat 'schtasks /run /tn "\\AnsibleDeploy"'
             }
         }
     }
